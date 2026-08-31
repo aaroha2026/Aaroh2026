@@ -107,6 +107,17 @@ footer{border-top-color:#2d171b;color:#776c6e}
 .phone-popup-card p{margin:0 0 20px;color:#aaa0a2;font-size:11px;line-height:1.5}
 .phone-popup-card p strong{color:#ff6874}
 input:invalid:not(:placeholder-shown){border-color:#ff3040;box-shadow:0 0 0 2px #ff304022}
+
+/* ALREADY REGISTERED POPUP */
+.registered-popup{display:none;position:fixed;inset:0;z-index:600;background:#000d;align-items:center;justify-content:center;padding:20px}
+.registered-popup.show{display:flex}
+.registered-popup-card{width:min(100%,360px);background:#0d0d0d;border:1px solid #ff3040;border-radius:7px;padding:26px;text-align:center;box-shadow:0 20px 60px #000}
+.registered-popup-icon{width:48px;height:48px;margin:0 auto 14px;border:2px solid #ff3040;border-radius:50%;color:#ff3040;font-size:24px;font-weight:900;line-height:44px}
+.registered-popup-card h3{margin:0 0 9px;color:#fff;font-size:20px}
+.registered-popup-card p{margin:0 0 20px;color:#aaa0a2;font-size:11px;line-height:1.6}
+.registered-popup-card p strong{color:#ff6874}
+.registered-popup-card .primary{width:100%}
+
 </style></head><body>
 <header class="header"><div class="container nav"><div class="logo"><b>A</b>AROH <small>2026</small></div><button class="menu" id="menu" onclick="toggleMenu()"><span></span><span></span><span></span></button></div></header>
 <div class="drawer" id="drawer"><button onclick="showPage('home')">Home</button><button onclick="showPage('register')">Register</button><button onclick="showPage('register');openBatchFromMenu()">Batch</button></div>
@@ -235,10 +246,57 @@ input:invalid:not(:placeholder-shown){border-color:#ff3040;box-shadow:0 0 0 2px 
 <script>
 const drawer=document.getElementById('drawer'),menu=document.getElementById('menu');
 let selectedBatch='';
+/* MANUALLY ADD REGISTERED BATCHES HERE */
+const registeredBatches = [
+   // 'A1',
+  // 'A2',
+  // 'A3',
+  // 'A4',
+  // 'A5',
+  // 'A6',
+  // 'A8',
+  // 'A9',
+  // 'A10',
+  // 'C1',
+  // 'C2',
+  // 'C3',
+  // 'C4',
+  // 'C5'
+];
+
+function showAlreadyRegistered(batch){
+  const popup=document.getElementById('registeredPopup');
+  const batchName=document.getElementById('registeredBatchName');
+  if(popup){
+    batchName.textContent=batch;
+    popup.classList.add('show');
+    popup.setAttribute('aria-hidden','false');
+  }
+}
+
+function closeRegisteredPopup(){
+  const popup=document.getElementById('registeredPopup');
+  if(popup){
+    popup.classList.remove('show');
+    popup.setAttribute('aria-hidden','true');
+  }
+}
+
 function toggleMenu(){drawer.classList.toggle('show');menu.classList.toggle('open')}
 function showPage(p){document.getElementById('home').classList.toggle('active',p==='home');document.getElementById('register').classList.toggle('active',p==='register');if(p==='register'){document.getElementById('batchStep').style.display='block';document.getElementById('eventStep').style.display='none';document.getElementById('formBox').classList.remove('show');}drawer.classList.remove('show');menu.classList.remove('open');scrollTo({top:0,behavior:'smooth'})}
 
-function selectBatch(batch){selectedBatch=batch;document.getElementById('selectedBatch').textContent=batch;document.getElementById('batchStep').style.display='none';document.getElementById('eventStep').style.display='block';scrollTo({top:0,behavior:'smooth'})}
+function selectBatch(batch){
+  if(registeredBatches.includes(batch)){
+    showAlreadyRegistered(batch);
+    return;
+  }
+
+  selectedBatch=batch;
+  document.getElementById('selectedBatch').textContent=batch;
+  document.getElementById('batchStep').style.display='none';
+  document.getElementById('eventStep').style.display='block';
+  scrollTo({top:0,behavior:'smooth'});
+}
 function openBatchFromMenu(){document.getElementById('batchStep').style.display='block';document.getElementById('eventStep').style.display='none';document.getElementById('formBox').classList.remove('show');}
 let currentEventFilled=false;
 const totalEvents=8;
@@ -422,6 +480,12 @@ function closeBatchModal(){
 
 async function confirmFinalBatch(){
   const value=document.getElementById('finalBatch').value;
+  if(registeredBatches.includes(value)){
+    closeBatchModal();
+    showAlreadyRegistered(value);
+    return;
+  }
+
   if(!value){
     alert('Please select your batch.');
     return;
@@ -451,6 +515,16 @@ async function confirmFinalBatch(){
   }
 }
 </script>
+
+<div id="registeredPopup" class="registered-popup" aria-hidden="true" onclick="if(event.target===this)closeRegisteredPopup()">
+  <div class="registered-popup-card">
+    <div class="registered-popup-icon">!</div>
+    <h3>ALREADY REGISTERED</h3>
+    <p>Batch <strong id="registeredBatchName"></strong> has already completed its registration.</p>
+    <button type="button" class="primary" onclick="closeRegisteredPopup()">OK</button>
+  </div>
+</div>
+
 <div id="phonePopup" class="phone-popup" aria-hidden="true">
   <div class="phone-popup-card">
     <div class="phone-popup-icon">!</div>
